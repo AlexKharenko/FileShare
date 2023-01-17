@@ -1,0 +1,22 @@
+{
+  "name": "fileshare",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "version": "1.0.0",
+  "description": "App for sharing the files locally",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky install",
+    "modules": "cd server && npm install && cd ../server && npm install",
+    "client": "cd client && npm run serve",
+    "server": "cd server && npm run dev",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+  },
+  "author": "AlexKharenko",
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^8.0.3"
+  }
+}
