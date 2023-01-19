@@ -9,9 +9,11 @@
   "main": "index.js",
   "scripts": {
     "prepare": "husky install",
-    "modules": "cd server && npm install && cd ../server && npm install",
+    "server:format": "cd server && npm run lint && npm run format",
+    "modules": "cd server && npm install && cd ../ && npm i",
     "client": "cd client && npm run serve",
-    "server": "cd server && npm run dev",
+    "server": "cd server && npm run start",
+    "server:dev": "cd server && npm run start:dev",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
   "author": "AlexKharenko",
