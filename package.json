@@ -9,12 +9,12 @@
   "main": "index.js",
   "scripts": {
     "prepare": "husky install",
-    "server:format": "cd server && npm run lint && npm run format",
+    "format": "cd server && npm run lint && npm run format && cd ../client && npm run lint",
     "modules": "cd server && npm install && cd ../ && npm i",
     "client": "cd client && npm run serve",
     "server": "cd server && npm run start",
     "server:dev": "cd server && npm run start:dev",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+    "dev": "concurrently --kill-others-on-fail \"npm run server:dev\" \"npm run client\""
   },
   "author": "AlexKharenko",
   "license": "ISC",
