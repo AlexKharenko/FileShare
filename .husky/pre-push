@@ -5,5 +5,5 @@ git pull
 cd server
 npm run lint
 npm run format
-# cd ../client
-# npm run lint
+cd ../client
+npm run lint
