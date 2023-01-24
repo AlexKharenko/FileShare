@@ -1,7 +1,7 @@
 export interface File {
-  id: number;
+  id?: number;
   name: string;
-  path: string;
+  path?: string;
   extension: string;
   sizeInMb: number;
 }

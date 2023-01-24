@@ -1,4 +1,5 @@
-export interface LogInRes {
-  token: string;
+export interface LoginRes {
   success: boolean;
+  message?: string;
+  isAdmin?: boolean;
 }
