@@ -6,9 +6,10 @@ import {
   Post,
   Delete,
   Body,
+  Query,
 } from '@nestjs/common';
 import { FolderService } from 'src/services/folder.service';
-import { Folder } from 'src/interfaces/folder.interfaces';
+import { Folder, FullFolder } from 'src/interfaces/folder.interfaces';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 
@@ -18,8 +19,11 @@ export class FolderController {
 
   @UseGuards(AuthGuard)
   @Get('folders/:id')
-  async getFolderById(@Param('id') id: number): Promise<Folder> {
-    return await this.folderService.findById(id);
+  async getFolderById(
+    @Param('id') id: number,
+    @Query('path') path: string,
+  ): Promise<FullFolder> {
+    return await this.folderService.findById(id, path);
   }
 
   @UseGuards(AuthGuard)
