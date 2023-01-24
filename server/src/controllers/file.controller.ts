@@ -8,31 +8,26 @@ import {
   Body,
   Response,
   StreamableFile,
+  Query,
 } from '@nestjs/common';
 import { FileService } from 'src/services/file.service';
-import { File } from 'src/interfaces/file.interfaces';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { createReadStream } from 'fs';
+import { DownloadGuard } from 'src/guards/download.guard';
 
 @Controller()
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  @Get('files/:id')
-  @UseGuards(AuthGuard)
-  async getFileById(@Param('id') id: number): Promise<File> {
-    return this.fileService.findById(id);
-  }
-
   @Get('files')
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   async getAllFiles() {
     return await this.fileService.getAll();
   }
 
   @Get('files/download/:id')
-  // @UseGuards(AuthGuard)
+  @UseGuards(DownloadGuard)
   async downloadFileById(
     @Param('id') id: number,
     @Response({ passthrough: true }) res,
@@ -44,9 +39,41 @@ export class FileController {
     const fileStream = createReadStream(`${path}/${name}.${extension}`, {
       end,
     });
+    const fullFileName = `${name}.${extension}`;
     res.headers({
       'Content-Type': 'multipart/form-data',
-      'Content-Disposition': `attachment; filename=${name}.${extension}`,
+      'Content-Disposition': `attachment; filename=${encodeURI(fullFileName)}`,
+      'Accept-Range': 'bytes',
+      'Content-Length': end,
+      'Content-Range': `bytes 0-${end}/${end}`,
+    });
+    return new StreamableFile(fileStream);
+  }
+
+  @Get('files/download/path/:folderId')
+  @UseGuards(DownloadGuard)
+  async downloadFileByPath(
+    @Param('folderId') folderId: number,
+    @Query('path') filePath: string,
+    @Query('filename') fileName: string,
+    @Query('extension') fileExtension: string,
+    @Response({ passthrough: true }) res,
+  ): Promise<StreamableFile> {
+    const { path, name, extension, sizeInMb } =
+      await this.fileService.getFileByPath(
+        folderId,
+        filePath,
+        fileName,
+        fileExtension,
+      );
+    const end = sizeInMb * 1024 * 1024;
+    const fileStream = createReadStream(`${path}/${name}.${extension}`, {
+      end,
+    });
+    const fullFileName = `${name}.${extension}`;
+    res.headers({
+      'Content-Type': 'multipart/form-data',
+      'Content-Disposition': `attachment; filename=${encodeURI(fullFileName)}`,
       'Accept-Range': 'bytes',
       'Content-Length': end,
       'Content-Range': `bytes 0-${end}/${end}`,
@@ -58,7 +85,7 @@ export class FileController {
   @UseGuards(AuthGuard, AdminGuard)
   async createFile(@Body() body) {
     const { name, path, extension } = body;
-    this.fileService.create({ name, path, extension });
+    await this.fileService.create({ name, path, extension });
     return { success: true };
   }
 
